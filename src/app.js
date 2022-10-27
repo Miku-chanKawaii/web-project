@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const contactController = require('./controllers/contact.controller')
+const contactController = require('./controllers/contact.controller');
+const ApiError = require('./app-error');
 
 const app = express();
 
@@ -11,16 +12,32 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to contact book application.' });
 });
 
-app.router('/api/contacts')
-    .get(contactController.findAll)
-    .post(contactController.create)
-    .delete(contactController.deleteAll);
+app.get(contactController.findAll)
+app.post(contactController.create)
+app.delete(contactController.deleteAll);
 
-app.route('/api/contacts/favorite').get(contactController.findAllFavorite);
+app.get(contactController.findAllFavorite);
 
-app.route('/api/contacts/:id(\\d+')
-    .get(contactController.findOne)
-    .put(contactController.update)
-    .delete(contactController.delete);
+app.get(contactController.findOne)
+app.put(contactController.update)
+app.delete(contactController.delete);
+
+// Handle 404 reponse.
+app.use((req, res, next) => {
+    // Handle for unkown route.
+    // Call next() to pass to the error handling middleware.
+    return next(new ApiError(404, 'Resource not found'));
+});
+
+// Define error-handling middleware last, after other app.use() and routes calls.
+app.use((error, req, res, next) => {
+    return res.status(error.statusCode || 500).json({
+        message: error.message || 'Internal Server Error',
+    });
+});
+
+app.get('/12', (req, res) => {
+    res.json({ message: 'Welcome to contact book application.' });
+});
 
 module.exports = app;
