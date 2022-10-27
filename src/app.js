@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const contactController = require('./controllers/contact.controller');
-const ApiError = require('./app-error');
+const ApiError = require('./api-error');
 
 const app = express();
 
@@ -34,10 +34,6 @@ app.use((error, req, res, next) => {
     return res.status(error.statusCode || 500).json({
         message: error.message || 'Internal Server Error',
     });
-});
-
-app.get('/12', (req, res) => {
-    res.json({ message: 'Welcome to contact book application.' });
 });
 
 module.exports = app;
